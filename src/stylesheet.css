@@ -1,66 +1,158 @@
-.docsify-pagination-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  overflow: hidden;
-  margin: 5em 0 1em;
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
+#mouse-scroll {
+  margin: auto;
+  width: 6%;
+  padding: 10px;
 }
-.pagination-item {
-  margin-top: 2.5em;
+
+.mouse-area {
+  height: 200px;
+  margin: 80px 0 0.8rem;
 }
-.pagination-item a,
-.pagination-item a:hover {
-  text-decoration: none;
+
+#mouse-scroll span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  -ms-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  margin: 0 0 3px 5px;
 }
-.pagination-item a {
-  color: currentColor;
+
+#mouse-scroll .mouse {
+  height: 29px;
+  width: 16px;
+  border-radius: 10px;
+  transform: none;
+  border: 2px solid #000;
+  top: 170px;
 }
-.pagination-item a:hover .pagination-item-title {
-  text-decoration: underline;
+
+#mouse-scroll .down-arrow-1 {
+  margin-top: 6px;
 }
-.pagination-item:not(:last-child) a .pagination-item-label,
-.pagination-item:not(:last-child) a .pagination-item-title,
-.pagination-item:not(:last-child) a .pagination-item-subtitle {
-  opacity: 0.3;
-  transition: all 200ms;
+
+#mouse-scroll .down-arrow-1,
+#mouse-scroll .down-arrow-2,
+#mouse-scroll .down-arrow-3 {
+  -webkit-animation: mouse-scroll 1s infinite;
+  -moz-animation: mouse-scroll 1s infinite;
 }
-.pagination-item:last-child .pagination-item-label,
-.pagination-item:not(:last-child) a:hover .pagination-item-label {
-  opacity: 0.6;
+
+#mouse-croll .down-arrow-1 {
+  -webkit-animation-delay: 0.1s;
+  -moz-animation-delay: 0.1s;
+  -webkit-animation-direction: alternate;
 }
-.pagination-item:not(:last-child) a:hover .pagination-item-title {
-  opacity: 1;
+
+#mouse-scroll .down-arrow-2 {
+  -webkit-animation-delay: 0.2s;
+  -moz-animation-delay: 0.2s;
+  -webkit-animation-direction: alternate;
 }
-.pagination-item-label {
-  font-size: 0.8em;
+#mouse-scroll .down-arrow-3 {
+  -webkit-animation-delay: 0.3s;
+  -moz-animation-dekay: 0.3s;
+  -webkit-animation-direction: alternate;
 }
-.pagination-item-label > * {
-  line-height: 1;
-  vertical-align: middle;
+
+#mouse-scroll .mouse-in {
+  height: 5px;
+  width: 2px;
+  display: block;
+  margin: 5px auto;
+  background: #000000;
+  position: relative;
 }
-.pagination-item-label svg {
-  height: 0.8em;
-  width: auto;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1px;
+#mouse-scroll .mouse-in {
+  -webkit-animation: animated-mouse 1.2s ease infinite;
+  moz-animation: mouse-animated 1.2s ease infinite;
 }
-.pagination-item--next {
-  margin-left: auto;
-  text-align: right;
+
+@keyframes animated-mouse {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(6px);
+    -ms-transform: translateY(6px);
+    transform: translateY(6px);
+  }
 }
-.pagination-item--next svg {
-  margin-left: 0.5em;
+@-webkit-keyframes mouse-scroll {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
-.pagination-item--previous svg {
-  margin-right: 0.5em;
+@keyframes mouse-scroll {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
-.pagination-item-title {
-  font-size: 1.6em;
+
+/* mouse up arrow */
+#mouse-scroll .up-arrow-1,
+#mouse-scroll .up-arrow-2,
+#mouse-scroll .up-arrow-3 {
+  -webkit-animation: mouse-scroll 1s infinite;
+  transform: rotate(-135deg);
+  -moz-animation: mouse-scroll 1s infinite;
 }
-.pagination-item-subtitle {
-  text-transform: uppercase;
-  opacity: 0.3;
+#mouse-croll .up-arrow-1 {
+  -webkit-animation-delay: 0.3s;
+  -moz-animation-delay: 0.3s;
+  -webkit-animation-direction: alternate;
+}
+#mouse-scroll .up-arrow-2 {
+  -webkit-animation-delay: 0.2s;
+  -moz-animation-delay: 0.2s;
+  -webkit-animation-direction: alternate;
+}
+#mouse-scroll .up-arrow-3 {
+  -webkit-animation-delay: 0.1s;
+  -moz-animation-dekay: 0.1s;
+  -webkit-animation-direction: alternate;
+}
+
+#mouse-scroll .mouse-out {
+  -webkit-animation: animated-out 1.2s ease infinite;
+  moz-animation: mouse-animated 1.2s ease infinite;
+}
+
+.mouse-out-area {
+  height: auto;
+  margin: auto;
+}
+
+@keyframes animated-out {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(6px);
+    -ms-transform: translateY(6px);
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 100;
+    -webkit-transform: translateY(0px);
+    -ms-transform: translateY(0px);
+    transform: translateY(0px);
+  }
 }

@@ -10,29 +10,23 @@ const ROUTER_MODE = {
   HASH: 'hash',
   HISTORY: 'history',
 }
-const DEFAULT_OPTIONS = (config) => ({
-  previousText: 'PREVIOUS',
-  nextText: 'NEXT',
-  crossChapter: false,
-  crossChapterText: false,
-  routerMode: config.routerMode || ROUTER_MODE.HASH,
-})
-const CONTAINER_CLASSNAME = 'docsify-pagination-container'
+const CONTAINER_CLASSNAME = 'docsify-scroll-container'
+const WRAPPER_CLASSNAME = 'docsify-scroll-wrapper'
 
 /**
  * basic utilities
  */
-function toArray (elements) {
+function toArray(elements) {
   return Array.prototype.slice.call(elements)
 }
-function findChapter (element) {
+function findChapter(element) {
   const container = closest(element, 'div > ul > li')
   return query('p', container)
 }
-function findHyperlink (element) {
+function findHyperlink(element) {
   return element.href ? element : query('a', element)
 }
-function isALinkTo (path, element) {
+function isALinkTo(path, element) {
   if (arguments.length === 1) {
     return (element) => isALinkTo(path, element)
   }
@@ -44,14 +38,14 @@ function isALinkTo (path, element) {
  * core renderer
  */
 class Link {
-  constructor (element) {
+  constructor(element) {
     if (!element) {
       return
     }
     this.chapter = findChapter(element)
     this.hyperlink = findHyperlink(element)
   }
-  toJSON () {
+  toJSON() {
     if (!this.hyperlink) {
       return
     }
@@ -63,7 +57,7 @@ class Link {
   }
 }
 
-function pagination (vm, { crossChapter, routerMode }) {
+function pagination(vm, { crossChapter, routerMode }) {
   try {
     const path = routerMode === ROUTER_MODE.HISTORY ?
       vm.route.path :
@@ -90,65 +84,111 @@ function pagination (vm, { crossChapter, routerMode }) {
   }
 }
 
-const template = {
-  container () {
+const TEMPALTES = {
+  container() {
     return `<div class="${CONTAINER_CLASSNAME}"></div>`
   },
-
-  inner (data, options) {
-    return [
-      data.prev && `
-        <div class="pagination-item pagination-item--previous">
-          <a href="${data.prev.href}">
-            <div class="pagination-item-label">
-              <svg class="icon" width="10" height="16" viewBox="0 0 10 16" xmlns="http://www.w3.org/2000/svg">
-                <polyline fill="none" vector-effect="non-scaling-stroke" points="8,2 2,8 8,14"/>
-              </svg>
-              <span>${options.previousText}</span>
-            </div>
-            <div class="pagination-item-title">${data.prev.name}</div>
-      `,
-      data.prev && options.crossChapterText && `<div class="pagination-item-subtitle">${data.prev.chapterName}</div>`,
-      data.prev && `</a>
-        </div>
-      `,
-      data.next && `
-        <div class="pagination-item pagination-item--next">
-          <a href="${data.next.href}">
-            <div class="pagination-item-label">
-              <span>${options.nextText}</span>
-              <svg width="10" height="16" viewBox="0 0 10 16" xmlns="http://www.w3.org/2000/svg">
-                <polyline fill="none" vector-effect="non-scaling-stroke" points="2,2 8,8 2,14"/>
-              </svg>
-            </div>
-            <div class="pagination-item-title">${data.next.name}</div>
-      `,
-      data.next && options.crossChapterText && `<div class="pagination-item-subtitle">${data.next.chapterName}</div>`,
-      data.next && `</a>
-        </div>
-      `
-    ].filter(Boolean).join('')
+  wrapper() {
+    return `<div class="${WRAPPER_CLASSNAME}"></div>`
   },
+  scrollup(pre) {
+    if (!pre) return null;
+    return (
+      `<div class='mouse-area mouse-out-area'>
+        <a href=${pre.href}>
+          <div id="mouse-scroll">
+            <div>
+              <span class="up-arrow-1"></span>
+              <span class="up-arrow-2"></span>
+              <span class="up-arrow-3"></span>
+            </div>
+            <div class="mouse">
+              <div class="mouse-in mouse-out"></div>
+            </div>
+          </div>
+        </a>
+      </div>`
+    )
+  },
+  scrolldown(next) {
+    return (
+      `<div class='mouse-area'>
+        <a href=${next.href}>
+          <div id="mouse-scroll">
+            <div class="mouse">
+              <div class="mouse-in"></div>
+            </div>
+            <div>
+              <span class="down-arrow-1"></span>
+              <span class="down-arrow-2"></span>
+              <span class="down-arrow-3"></span>
+            </div>
+          </div>
+        </a>
+      </div>`
+    )
+  }
+
 }
 
+function scrollTo(offset, callback) {
+  const fixedOffset = offset.toFixed(),
+      onScroll = function () {
+          if (window.pageYOffset.toFixed() === fixedOffset) {
+              window.removeEventListener('scroll', onScroll)
+              callback()
+          }
+      }
+
+  window.addEventListener('scroll', onScroll)
+  onScroll()
+  window.scrollTo({
+      top: offset,
+      behavior: 'smooth'
+  })
+}
 /**
  * installation
  */
-export function install (hook, vm) {
-  let options = Object.assign(
-    {},
-    DEFAULT_OPTIONS(vm.config),
-    vm.config.pagination || {}
-  )
+export function install(hook, vm) {
+  window.onscroll = function (ev) {
+    let pagi = pagination(vm, {
+      crossChapter: true,
+      routerMode: 'hash'
+    })
+    let { next, prev } = pagi;
+    // scroll top
+    // if (window.scrollY === 0 && prev) {
+    //   window.history.pushState({}, null, prev.href);
+    //   scrollTo(120, () => {
+    //     window.dispatchEvent(new HashChangeEvent("hashchange"));
+    //   })
+    // }
+    // scroll bottom
+    if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight && next) {
+      window.history.pushState({}, null, next.href);
+      scrollTo(document.querySelector('.markdown-section').firstElementChild.offsetTop, () => {
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+      })
+    }
+  };
 
-  function render () {
+  function render() {
     const container = query(`.${CONTAINER_CLASSNAME}`)
+    const wrapper = query(`.${WRAPPER_CLASSNAME}`)
     if (!container) {
       return
     }
-    container.innerHTML = template.inner(pagination(vm, options), options)
+    const pagi = pagination(vm, {
+      crossChapter: true,
+      routerMode: 'hash'
+    })
+
+    wrapper.innerHTML = TEMPALTES.scrollup(pagi.prev)
+    container.innerHTML = TEMPALTES.scrolldown(pagi.next)
   }
 
-  hook.afterEach((html) => html + template.container())
+  hook.afterEach((html) => TEMPALTES.wrapper() + html + TEMPALTES.container());
   hook.doneEach(() => render())
+
 }
